@@ -49,6 +49,24 @@ impl Tensor {
     Tensor { data: new, shape: vec![self.shape[0], other.shape[1]] }
   }
 
+  pub fn transpose(&self) -> Tensor {
+    let mut v: Vec<f32> = Vec::new();
+
+    for i in 0..self.shape[1] {
+      for j in 0..self.shape[0] {
+        v.push(self.data[j * self.shape[1] + i])
+      }
+    }
+    Tensor { data: v, shape: vec![self.shape[1], self.shape[0]] }
+  }
+
+  pub fn reshape(&self, new_shape: Vec<usize>) -> Tensor {
+    assert_eq!(self.shape.iter().product::<usize>(), new_shape.iter().product::<usize>(),
+      "Sum of new shape {:?} not equal to old shape {:?}", new_shape, self.shape,
+    );
+    Tensor { data: self.data.clone(), shape: new_shape }
+  }
+
   fn assert_equal(&self, other: &Tensor) {
     assert_eq!(&self.shape, &other.shape, 
       "Tensor shapes are not equal! {:?} != {:?}", &self.shape, other.shape

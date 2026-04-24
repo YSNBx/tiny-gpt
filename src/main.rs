@@ -10,6 +10,12 @@ fn main() {
   let t3 = Tensor::new(vec![2.1, 2.2, 2.3, 2.4, 2.5, 2.6], vec![2, 3]).multiply(&t2);
   println!("{}", t3);
 
-  let t4 = t1.multiply_matrix(&Tensor::new(vec![7.0, 8.0, 9.0, 10.0, 11.0, 12.0], vec![3, 2]));
+  let t4 = &t1.multiply_matrix(&Tensor::new(vec![7.0, 8.0, 9.0, 10.0, 11.0, 12.0], vec![3, 2]));
   println!("{}", t4);
+
+  let t5 = &t1.transpose();
+  println!("{}", t5);
+
+  let t6 = &t1.reshape(vec![3, 2]);
+  println!("{}", t6);
 }
