@@ -4,7 +4,7 @@ pub struct Tensor {
 }
 
 impl Tensor {
-  pub fn new (data: Vec<f32>, shape: Vec<usize>) -> Self {
+  pub fn new(data: Vec<f32>, shape: Vec<usize>) -> Self {
     let expected: usize = shape.iter().product();
     assert_eq!(data.len(), expected,
       "Data length {} doesn't match shape {:?} (expected {})",
