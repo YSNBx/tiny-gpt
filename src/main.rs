@@ -1,10 +1,13 @@
-use crate::training::gradient::gradient_descent;
+use crate::training::{embedder::Embedder, gradient::gradient_descent, tokenizer::text_to_indices};
 
 mod tensor;
 mod training;
 
 fn main() {
-    println!("{}", gradient_descent(0.0, 0.1, 50));
+  println!("{}", gradient_descent(0.0, 0.1, 50));
+  let embedder = Embedder::new(26, 4);
+  let indices = text_to_indices("hello");
+  println!("{}", embedder.forward(indices));
   // let _g: Gradient = Gradient { minimizer, learning_rate, steps };
   //
   // let t1 = Tensor::new(vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0], vec![2, 3]);
