@@ -1,4 +1,4 @@
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Tensor {
   pub data: Vec<f32>,
   pub shape: Vec<usize>
@@ -34,12 +34,12 @@ impl Tensor {
     Tensor { data: new_data, shape: self.shape.clone() }
   }
 
-  pub fn multiply_matrix(&self, other: &Tensor) -> Tensor {
+  pub fn matmul(&self, other: &Tensor) -> Tensor {
     self.assert_equal_dimensions(other);
     let mut new: Vec<f32> = Vec::new();
 
-    for i in 0..self.shape[0] { //[2,3]
-      for j in 0..other.shape[1] { //[3, 2]
+    for i in 0..self.shape[0] {
+      for j in 0..other.shape[1] {
         let mut sum = 0.0;
         for k in 0..self.shape[1] {
           sum += self.data[i * self.shape[1] + k] * other.data[k * other.shape[1] + j];
@@ -66,6 +66,32 @@ impl Tensor {
       "Sum of new shape {:?} not equal to old shape {:?}", new_shape, self.shape,
     );
     Tensor { data: self.data.clone(), shape: new_shape }
+  }
+
+  pub fn softmax(&self) -> Tensor {
+    let mut results: Vec<f32> = Vec::new();
+    for i in 0..self.shape[0] {
+      let start = i * self.shape[1];
+      let end = start + self.shape[1];
+
+      let slice = &self.data[start..end];
+      let max = slice.iter().cloned().fold(f32::NEG_INFINITY, f32::max);
+      let exp_sums: Vec<f32> = slice.iter()
+        .map(|x| (*x - max).exp())
+        .collect();
+      let divisor: f32 = exp_sums.iter().sum();
+      results.extend(exp_sums.iter().map(|x| *x / divisor));
+    }
+    Tensor { data: results, shape: self.shape.clone() }
+  }
+
+  pub fn divide_scalar(&self, scalar: f32) -> Tensor {
+    let data = self.data
+      .iter()
+      .map(|x| *x / scalar)
+      .collect();
+
+    Tensor { data: data, shape: self.shape.clone() }
   }
 
   fn assert_equal(&self, other: &Tensor) {
