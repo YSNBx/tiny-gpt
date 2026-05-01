@@ -21,31 +21,11 @@ impl Attention {
     let q: Tensor = input.matmul(&self.w_q);
     let k: Tensor = input.matmul(&self.w_k);
     let v: Tensor = input.matmul(&self.w_v);
+
     let scores: Tensor = q.matmul(&k.transpose());
     let scaled_scores: Tensor = scores.divide_scalar((self.w_q.shape[0] as f32).sqrt());
     let weights: Tensor = scaled_scores.softmax();
     weights.matmul(&v)
-  }
-  
-  pub fn compute_q(&self, input: &Tensor) -> Tensor {
-    Tensor::matmul(input, &self.w_q)
-  }
-
-  pub fn compute_k(&self, input: &Tensor) -> Tensor {
-    Tensor::matmul(input, &self.w_k)
-  }
-
-  pub fn compute_v(&self, input: &Tensor) -> Tensor {
-    Tensor::matmul(input, &self.w_v)
-  }
-
-  pub fn compute_scores(&self, q: &Tensor, k: &Tensor) -> Tensor {
-    let k_t = k.transpose();
-    q.matmul(&k_t)
-  }
-
-  pub fn compute_output(&self, weights: &Tensor, v: &Tensor) -> Tensor {
-    weights.matmul(v)
   }
 }
 

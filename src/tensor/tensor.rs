@@ -85,6 +85,14 @@ impl Tensor {
     Tensor { data: results, shape: self.shape.clone() }
   }
 
+  pub fn relu(&self) -> Tensor {
+    let data = self.data
+      .iter()
+      .map(|x| (*x).max(0.0))
+      .collect();
+    Tensor { data: data, shape: self.shape.clone() }
+  }
+
   pub fn divide_scalar(&self, scalar: f32) -> Tensor {
     let data = self.data
       .iter()
