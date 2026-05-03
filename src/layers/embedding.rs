@@ -2,13 +2,13 @@
 use crate::{tensor::tensor::Tensor, util::vec_randomizer::random_vec};
 
 
-pub struct Embedder {
+pub struct Embedding {
   tensor: Tensor
 }
 
-impl Embedder {
+impl Embedding {
   pub fn new(vocab_size: usize, embedding_dim: usize) -> Self {
-    Embedder { tensor: Tensor::new(random_vec(vocab_size * embedding_dim), vec![vocab_size, embedding_dim]) }
+    Embedding { tensor: Tensor::new(random_vec(vocab_size * embedding_dim), vec![vocab_size, embedding_dim]) }
   }
 
   pub fn forward(&self, indices: Vec<usize>) -> Tensor {

@@ -11,7 +11,7 @@ impl Output {
     }
   }
 
-  pub fn compute(&self, input: &Tensor) -> Tensor {
+  pub fn forward(&self, input: &Tensor) -> Tensor {
     input.matmul(&self.w)
       .softmax()
   }
