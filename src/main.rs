@@ -1,5 +1,5 @@
+use crate::layers::loss;
 use crate::model::Model;
-use crate::tensor::tensor::Tensor;
 use crate::data::tokenizer::text_to_indices;
 
 mod data;
@@ -9,8 +9,13 @@ mod util;
 mod model;
 
 fn main() {
-  let indices = text_to_indices("hello");
-  let model = Model::new(26, 4);
-  let output: Tensor = model.forward(indices);
-  println!("{}", output);
+  let model: Model = Model::new(26, 4);
+
+  let input_indices: Vec<usize> = text_to_indices("hell");
+  let target_indices: Vec<usize> = text_to_indices("ello");
+
+  let output = model.forward(input_indices);
+  let loss = loss::cross_entropy_loss(&output, &target_indices);
+
+  println!("{}", loss);
 }
