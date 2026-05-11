@@ -70,16 +70,29 @@ impl Tensor {
 
   pub fn softmax(&self) -> Tensor {
     let mut results: Vec<f32> = Vec::new();
+    
+    // for each row in the matrix
     for i in 0..self.shape[0] {
+      // find where this row starts and end in the flat Vec
       let start = i * self.shape[1];
       let end = start + self.shape[1];
 
+      // grab one row
       let slice = &self.data[start..end];
+
+      //find max value in this row for numerical stability
       let max = slice.iter().cloned().fold(f32::NEG_INFINITY, f32::max);
+
+      // e^(logit - max) for each value in this row
       let exp_sums: Vec<f32> = slice.iter()
         .map(|x| (*x - max).exp())
         .collect();
+
+      // sum the exponentials in this row
       let divisor: f32 = exp_sums.iter().sum();
+
+      // divide each exponential by the row sum
+      // now this row sums up to 1.0
       results.extend(exp_sums.iter().map(|x| *x / divisor));
     }
     Tensor { data: results, shape: self.shape.clone() }

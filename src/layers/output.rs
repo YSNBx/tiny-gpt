@@ -12,8 +12,11 @@ impl Output {
   }
 
   pub fn forward(&self, input: &Tensor) -> Tensor {
+    self.logits(input).softmax()
+  }
+
+  pub fn logits(&self, input: &Tensor) -> Tensor {
     input.matmul(&self.w)
-      .softmax()
   }
 }
 
