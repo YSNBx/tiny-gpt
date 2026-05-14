@@ -1,7 +1,8 @@
-use crate::{tensor::tensor::Tensor, util::vec_randomizer::random_vec};
+use crate::util::vec_randomizer::random_vec;
+use crate::tensor::tensor::Tensor;
 
 pub struct Output {
-  w: Tensor
+  w: Tensor //weight matrix
 }
 
 impl Output {
@@ -17,6 +18,17 @@ impl Output {
 
   pub fn logits(&self, input: &Tensor) -> Tensor {
     input.matmul(&self.w)
+  }
+
+  pub fn apply_gradient(&mut self, grad: &Tensor, learning_rate: f32) {
+    assert_eq!(self.w.shape, grad.shape);
+    for i in 0..self.w.data.len() {
+      self.w.data[i] -= learning_rate * grad.data[i];
+    }
+  }
+
+  pub fn get_w(&self) -> Tensor {
+    self.w.clone()
   }
 }
 

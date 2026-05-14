@@ -21,11 +21,19 @@ impl Model {
     }
   }
 
-  pub fn forward(&self, indices: Vec<usize>) -> Tensor {
+  pub fn forward(&self, indices: &[usize]) -> (Tensor, Tensor) {
     let embedded: Tensor = self.embedding.forward(indices);
-    let attentioned: Tensor = self.attention.forward(&embedded);
-    let feed_forwarded: Tensor = self.feed_forward.forward(&attentioned);
-    let output = self.output.forward(&feed_forwarded);
-    output
+    // let attentioned: Tensor = self.attention.forward(&embedded);
+    // let feed_forwarded: Tensor = self.feed_forward.forward(&attentioned);
+    let probs = self.output.forward(&embedded);
+    (probs, embedded)
+  }
+
+  pub fn backward(&mut self, d_logits: &Tensor, final_hidden: &Tensor, input_indices: &[usize], learning_rate: f32) {
+    let d_w_out = final_hidden.transpose().matmul(&d_logits);
+    let d_embedding = &d_logits.matmul(&self.output.get_w().transpose());
+
+    self.embedding.apply_gradient(&d_embedding, &input_indices, learning_rate);
+    self.output.apply_gradient(&d_w_out, learning_rate);
   }
 }

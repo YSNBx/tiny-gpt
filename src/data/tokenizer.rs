@@ -7,5 +7,8 @@ pub fn text_to_indices(input: &str) -> Vec<usize> {
 }
 
 fn map(ch: char) -> usize {
+  if ch == ' ' {
+    return 26;
+  }
   return ch.to_ascii_lowercase() as usize - 'a' as usize;
 }
