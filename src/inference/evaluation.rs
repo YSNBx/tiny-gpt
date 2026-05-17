@@ -28,18 +28,11 @@ pub fn inspect_predictions(model: &Model, input: &str) -> String {
     let predicted_char = index_to_char(best_idx);
     predicted.push(predicted_char);
 
-    println!(
-      "Position {}: predicted '{}' ({:.1}%)",
-      i,
-      predicted_char,
-      best_prob * 100.0
-    );
+    println!("Position {}: predicted '{}' ({:.1}%)", i, predicted_char, best_prob * 100.0);
   }
 
   let predicted_text = predicted.iter().collect::<String>();
-
   println!("input: {} -> output: {:?}", input, predicted_text);
-
   predicted_text
 }
 

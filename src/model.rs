@@ -1,39 +1,40 @@
-use crate::tensor::tensor::Tensor;
+use crate::layers::cache::model_cache::ModelCache;
 use crate::layers::embedding::Embedding;
-use crate::layers::attention::Attention;
 use crate::layers::feed_forward::FeedForward;
 use crate::layers::output::Output;
+use crate::tensor::tensor::Tensor;
 
 pub struct Model {
-  embedding: Embedding,
-  attention: Attention,
-  feed_forward: FeedForward,
-  output: Output,
+	embedding: Embedding,
+	// attention: Attention,
+	feed_forward: FeedForward,
+	output: Output,
 }
 
+#[rustfmt::skip]
 impl Model {
-  pub fn new(vocab_size: usize, embedding_dim: usize)  -> Model {
-    Model {
+	pub fn new(vocab_size: usize, embedding_dim: usize) -> Model {
+		Model { 
       embedding: Embedding::new(vocab_size, embedding_dim),
-      attention: Attention::new(embedding_dim),
+      // attention: Attention::new(embedding_dim),
       feed_forward: FeedForward::new(embedding_dim),
-      output: Output::new(vocab_size, embedding_dim),
+      output: Output::new(vocab_size, embedding_dim) 
     }
-  }
+	}
 
-  pub fn forward(&self, indices: &[usize]) -> (Tensor, Tensor) {
-    let embedded: Tensor = self.embedding.forward(indices);
-    // let attentioned: Tensor = self.attention.forward(&embedded);
-    // let feed_forwarded: Tensor = self.feed_forward.forward(&attentioned);
-    let probs = self.output.forward(&embedded);
-    (probs, embedded)
-  }
+	pub fn forward(&self, indices: &[usize]) -> (Tensor, ModelCache) {
+		let embedded: Tensor = self.embedding.forward(indices);
+		// let attentioned: Tensor = self.attention.forward(&embedded);
+		let (hidden_states, ff_cache) = self.feed_forward.forward(&embedded); //TODO replace with attentioned
+		let (probabilities, output_cache) = self.output.forward(&hidden_states);
 
-  pub fn backward(&mut self, d_logits: &Tensor, final_hidden: &Tensor, input_indices: &[usize], learning_rate: f32) {
-    let d_w_out = final_hidden.transpose().matmul(&d_logits);
-    let d_embedding = &d_logits.matmul(&self.output.get_w().transpose());
+		let model_cache: ModelCache = ModelCache::new(output_cache.clone(), ff_cache.clone());
+		(probabilities, model_cache)
+	}
 
-    self.embedding.apply_gradient(&d_embedding, &input_indices, learning_rate);
-    self.output.apply_gradient(&d_w_out, learning_rate);
-  }
+	pub fn backward(&mut self, d_logits: &Tensor, cache: &ModelCache,
+	                context_indices: &[usize], learning_rate: f32) {
+		let d_ff_out = self.output.backward(d_logits, &cache.output_cache, learning_rate);
+		self.feed_forward.backward(&d_ff_out, &cache.feed_forward_cache, learning_rate);
+	}
 }

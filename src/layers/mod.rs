@@ -1,3 +1,5 @@
+pub mod cache;
+
 pub mod gradient;
 pub mod embedding;
 pub mod attention;

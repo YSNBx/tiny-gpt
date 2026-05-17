@@ -1,3 +1,4 @@
+use crate::layers::cache::output_cache::OutputCache;
 use crate::util::vec_randomizer::random_vec;
 use crate::tensor::tensor::Tensor;
 
@@ -12,12 +13,23 @@ impl Output {
     }
   }
 
-  pub fn forward(&self, input: &Tensor) -> Tensor {
-    self.logits(input).softmax()
+  pub fn forward(&self, input: &Tensor) -> (Tensor, OutputCache) {
+    let logits = self.logits(input);
+    let probabilities = logits.softmax();
+    let cache = OutputCache::new(input.clone(), logits.clone(), probabilities.clone());
+    (probabilities, cache)
   }
 
   pub fn logits(&self, input: &Tensor) -> Tensor {
     input.matmul(&self.w)
+  }
+
+  pub fn backward(&mut self, d_logits: &Tensor, cache: &OutputCache, learning_rate: f32) -> Tensor {
+    let d_w_out = cache.input.transpose().matmul(d_logits);
+    let d_input = d_logits.matmul(&self.w.transpose());
+
+    self.apply_gradient(&d_w_out, learning_rate);
+    d_input
   }
 
   pub fn apply_gradient(&mut self, grad: &Tensor, learning_rate: f32) {
@@ -25,10 +37,6 @@ impl Output {
     for i in 0..self.w.data.len() {
       self.w.data[i] -= learning_rate * grad.data[i];
     }
-  }
-
-  pub fn get_w(&self) -> Tensor {
-    self.w.clone()
   }
 }
 
