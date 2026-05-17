@@ -1,0 +1,1 @@
+pub const TRAINING_TEXT: &str = "the quick brown fox jumps over the lazy dog the fox and the dog are friends the quick fox runs and jumps the lazy dog sleeps on the mat the brown dog and the quick fox play in the park the dog runs after the fox the fox jumps over the log";
