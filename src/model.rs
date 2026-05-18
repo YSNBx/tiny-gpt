@@ -1,3 +1,4 @@
+use crate::layers::attention::Attention;
 use crate::layers::cache::model_cache::ModelCache;
 use crate::layers::embedding::Embedding;
 use crate::layers::feed_forward::FeedForward;
@@ -6,20 +7,20 @@ use crate::tensor::tensor::Tensor;
 
 pub struct Model {
 	embedding: Embedding,
-	// attention: Attention,
+	attention: Attention,
 	feed_forward: FeedForward,
 	output: Output,
 }
 
-#[rustfmt::skip]
 impl Model {
+	#[rustfmt::skip]
 	pub fn new(vocab_size: usize, embedding_dim: usize) -> Model {
 		Model { 
-      embedding: Embedding::new(vocab_size, embedding_dim),
-      // attention: Attention::new(embedding_dim),
-      feed_forward: FeedForward::new(embedding_dim),
-      output: Output::new(vocab_size, embedding_dim) 
-    }
+			embedding: Embedding::new(vocab_size, embedding_dim),
+			attention: Attention::new(embedding_dim),
+			feed_forward: FeedForward::new(embedding_dim),
+			output: Output::new(vocab_size, embedding_dim) 
+		}
 	}
 
 	pub fn forward(&self, indices: &[usize]) -> (Tensor, ModelCache) {
@@ -32,9 +33,9 @@ impl Model {
 		(probabilities, model_cache)
 	}
 
-	pub fn backward(&mut self, d_logits: &Tensor, cache: &ModelCache,
-	                context_indices: &[usize], learning_rate: f32) {
+	pub fn backward(&mut self, d_logits: &Tensor, cache: &ModelCache, context_indices: &[usize], learning_rate: f32) {
 		let d_ff_out = self.output.backward(d_logits, &cache.output_cache, learning_rate);
-		self.feed_forward.backward(&d_ff_out, &cache.feed_forward_cache, learning_rate);
+		let d_embedding = self.feed_forward.backward(&d_ff_out, &cache.feed_forward_cache, learning_rate);
+		self.embedding.apply_gradient(&d_embedding, context_indices, learning_rate);
 	}
 }

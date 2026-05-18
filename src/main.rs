@@ -6,16 +6,16 @@ use crate::inference::generation::generate_greedy;
 use crate::layers::loss::{self, cross_entropy_backward};
 use crate::model::Model;
 
+mod config;
 mod data;
 mod inference;
 mod layers;
 mod model;
 mod tensor;
 mod util;
-mod config;
 
 fn main() {
-  let config = TrainingConfig::default();
+	let config = TrainingConfig::default();
 	let mut model: Model = Model::new(config.vocab_size, config.embedding_dim);
 	let training_data = build_training_data(corpus::TRAINING_TEXT, config.sequence_length);
 

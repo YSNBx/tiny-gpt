@@ -6,12 +6,8 @@ pub struct ModelCache {
 	pub feed_forward_cache: FeedForwardCache,
 }
 
-#[rustfmt::skip]
 impl ModelCache {
 	pub fn new(output_cache: OutputCache, feed_forward_cache: FeedForwardCache) -> Self {
-		ModelCache { 
-      output_cache,
-      feed_forward_cache 
-    }
+		ModelCache { output_cache, feed_forward_cache }
 	}
 }
